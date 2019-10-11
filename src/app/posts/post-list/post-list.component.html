@@ -1,0 +1,43 @@
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+<mat-accordion multi="true" *ngIf="posts.length>0 && !isLoading">
+  <mat-expansion-panel *ngFor="let post of posts">
+    <mat-expansion-panel-header>
+      Title: {{post.title}}
+    </mat-expansion-panel-header>
+    <div class="post-image">
+      <img [src]="post.imagePath" [alt]="post.title">
+    </div>
+    <p>Description: {{post.content}}</p>
+    <p>AWS Image Recognition:</p>
+    <div class="table-container mat-elevation-z8">
+      <table mat-table [dataSource]='post.labels'>
+        <ng-container matColumnDef='number'>
+          <th mat-header-cell *matHeaderCellDef>No.</th>
+          <td mat-cell *matCellDef="let label"> {{post.labels.indexOf(label)+1}} </td>
+        </ng-container>
+        <ng-container matColumnDef='label'>
+          <th mat-header-cell *matHeaderCellDef> Label </th>
+          <td mat-cell *matCellDef="let label"> {{label.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef='certainty'>
+          <th mat-header-cell *matHeaderCellDef> Certainty </th>
+          <td mat-cell *matCellDef="let label"> {{label.confidence}} </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+      </table>
+    </div>
+    <mat-action-row *ngIf="userIsAuthenticated && userId === post.creator">
+      <a mat-button color="primary" [routerLink]="['/edit', post.id]">EDIT</a>
+      <button mat-button color="warn" (click)="onDelete(post.id)">DELETE</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>
+<mat-paginator [length]="totalPosts"
+               [pageSize]="postsPerPage"
+               [pageSizeOptions]="pageSizeOptions"
+               (page)="onChangedPage($event)"
+               *ngIf="posts.length >0">
+</mat-paginator>
+<p class="info-text mat-body-1" *ngIf="posts.length <=0 && !isLoading">No posts yet!</p>
+
